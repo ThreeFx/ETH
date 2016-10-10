@@ -41,6 +41,13 @@ instance Applicative Set where
   Elem fx  fxs  <*> x = fmap fx x `mappend`(fxs <*> x)
   Set  fxs fxss <*> x = Set (fxs <*> x) (fxss <*> x)
 
+instance Monad Set where
+  return = pure
+  -- (>>=) :: Set a -> (a -> Set b) -> Set b
+  Empty      >>= f = Empty
+  Elem x set >>= f = f x `mappend` (set >>= f)
+  Set  s set >>= f = Set (s >>= f) $ set >>= f
+
 instance Foldable Set where
   foldMap _ Empty = mempty
   foldMap f (Elem x set) = f x `mappend` foldMap f set
