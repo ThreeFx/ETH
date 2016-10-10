@@ -34,6 +34,13 @@ instance Functor Set where
   fmap f (Elem x set) = Elem (f x) (fmap f set)
   fmap f (Set s set) = Set (fmap f s) (fmap f set)
 
+instance Applicative Set where
+  pure x = Elem x Empty
+  Empty         <*> x = Empty
+  x             <*> Empty = Empty
+  Elem fx  fxs  <*> x = fmap fx x `mappend`(fxs <*> x)
+  Set  fxs fxss <*> x = Set (fxs <*> x) (fxss <*> x)
+
 instance Foldable Set where
   foldMap _ Empty = mempty
   foldMap f (Elem x set) = f x `mappend` foldMap f set
@@ -86,3 +93,12 @@ norm (Set s set)  = Set (norm s) $ norm $ setFilter (const True) (/=s) set
 set :: Set Int
 -- set = {4,5,{{5},5,6,{5},{5},7},5,5}
 set = Elem 4 (Elem 5 (Set (Set (Elem 5 Empty) (Elem 5 (Elem 6 (Set (Elem 5 Empty) (Set (Elem 5 Empty) (Elem 7 Empty)))))) (Elem 5 $ Elem 5 Empty)))
+
+a :: Set Int
+a = Elem 1 (Set (Elem 2 (Elem 3 Empty)) (Elem 4 Empty))
+
+b :: Set Int
+b = Elem 2 $ (Set (Elem 3 $ Elem 4 Empty) Empty)
+
+c :: Set Int
+c = Set (Elem 2 $ Elem 3 Empty) Empty
