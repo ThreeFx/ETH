@@ -22,14 +22,14 @@ instance Functor Set where
 
 instance Foldable Set where
   foldMap _ Empty = mempty
-  foldMap f (Elem x set) = Element (f x) <*> foldMap f set
+  foldMap f (Elem x set) = f x `mappend` foldMap f set
   foldMap f (Set s set) = foldMap f s `mappend` foldMap f set
 
---instance Traversable Set where
+instance Traversable Set where
   -- traverse :: Applicative f => (a -> f b) -> Set a -> f (Set b)
-  --traverse f Empty = Empty
-  --traverse f (Elem x set) = Elem <$> f x <*> traverse f set
-  --traverse f (Set s set) = traverse f s ??? traverse f set
+  traverse f Empty = pure Empty
+  traverse f (Elem x set) = Elem <$> f x <*> traverse f set
+  traverse f (Set s set) = Set <$> traverse f s <*> traverse f set
 
 setMap :: Monoid m => (a -> m) -> (Set a -> m) -> Set a -> m
 setMap fe fs Empty = mempty
