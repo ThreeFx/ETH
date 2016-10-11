@@ -3,12 +3,12 @@
 {-# LANGUAGE RankNTypes #-}
 module Mengenlehre where
 
-import Data.Foldable
+import Data.Foldable hiding (elem)
 import Data.Function
 import Data.Monoid
 import Data.Traversable
 
-import Prelude hiding (filter)
+import Prelude hiding (elem, filter)
 import qualified Prelude as P
 
 data Set a where
@@ -70,15 +70,15 @@ setMap fe fs Empty = mempty
 setMap fe fs (Elem x set) = fe x `mappend` setMap fe fs set
 setMap fe fs (Set s set) = fs s `mappend` setMap fe fs set
 
--- this must be equal to the foldmap instance
+-- this must be equal to the foldMap instance
 foldMap' :: Monoid m => (a -> m) -> Set a -> m
 foldMap' f = setMap f (fix $ setMap f)
 
-forallSetMap :: Monoid m => (forall a. a -> m) -> Set a -> m
-forallSetMap f = setMap f f
+topMap :: Monoid m => (forall a. a -> m) -> Set a -> m
+topMap f = setMap f f
 
 magnitude :: Set a -> Int
-magnitude = getSum . forallSetMap (const $ Sum 1)
+magnitude = getSum . topMap (const $ Sum 1)
 
 setFilter :: (a -> Bool) -> (Set a -> Bool) -> Set a -> Set a
 setFilter fe fs Empty = Empty
@@ -89,13 +89,22 @@ setFilter fe fs (Set s set)
   | fs s = Set s $ setFilter fe fs set
   | otherwise = setFilter fe fs set
 
-setEq :: Eq a => Set a -> Set a -> Bool
-setEq = (==) `on` norm
+elem :: Eq a => a -> Set a -> Bool
+elem x = getAny . setMap (Any . (==x)) (Any . const False)
+
+elemSet :: Eq a => Set a -> Set a -> Bool
+elemSet set = getAny . setMap (Any . const False) (Any . subset set)
+
+subset :: Eq a => Set a -> Set a -> Bool
+subset set1 set2 = getAll $ setMap (All . (`elem` norm2)) (All . (`elemSet` norm2)) norm1
+  where
+    norm1 = norm set1
+    norm2 = norm set2
 
 norm :: Eq a => Set a -> Set a
-norm Empty = Empty
-norm (Elem x set) = Elem x $ norm $ setFilter (/=x) (const True) set
-norm (Set s set)  = Set (norm s) $ norm $ setFilter (const True) (/=s) set
+norm Empty        = Empty
+norm (Elem x set) = Elem x $ setFilter (/=x) (const False) set
+norm (Set s set)  = undefined
 
 set :: Set Int
 -- set = {4,5,{{5},5,6,{5},{5},7},5,5}
@@ -108,4 +117,13 @@ b :: Set Int
 b = Elem 2 $ (Set (Elem 3 $ Elem 4 Empty) Empty)
 
 c :: Set Int
-c = Set (Elem 2 $ Elem 3 Empty) Empty
+c = Set (Elem 2 $ Elem 3 Empty) $ Elem 4 Empty
+
+d :: Set Int
+d = Set (Elem 5 $ Elem 6 Empty) Empty
+
+e = Set (Elem 6 $ Elem 5 Empty) Empty
+
+f = Elem 4 (Set (Elem 3 $ Elem 2 Empty) Empty)
+
+g = Empty
