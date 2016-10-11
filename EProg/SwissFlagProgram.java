@@ -1,8 +1,13 @@
 /**
- * LÃ¶sung Ãœbungsaufgabe Schweizer Flagge
+ * Lösung Übungsaufgabe Schweizer Flagge
  * @author Ben Fiedler
  */
+import java.awt.Color;
+import java.awt.Graphics;
 import java.util.Collections;
+
+import javax.swing.JComponent;
+import javax.swing.JFrame;
 
 public class SwissFlagProgram {
 	/**
@@ -60,11 +65,11 @@ public class SwissFlagProgram {
 			
 			flag = new boolean[size][size];
 			
-			System.out.println(size);
-			System.out.println(middle);
-			System.out.println(cross);
-			System.out.println(arm);
-			System.out.println(border);
+			//System.out.println(size);
+			//System.out.println(middle);
+			//System.out.println(cross);
+			//System.out.println(arm);
+			//System.out.println(border);
 			
 			createFlag();
 		}
@@ -101,7 +106,7 @@ public class SwissFlagProgram {
 		 * @return
 		 */
 		private String horizontalBorder() {
-			return "\u001b[0m" + "+" + repeat("-", htwr * flag.length) + "+"; 
+			return (color ? "\u001b[0m" : "") + "+" + repeat("-", htwr * flag.length) + "+"; 
 		}
 		
 		private String redPixel() {
@@ -123,16 +128,38 @@ public class SwissFlagProgram {
 			
 			for (int i = 0; i < flag.length; i++) {
 				if (drawBorder)
-					result.append("\u001b[0m|");
+					result.append((color ? "\u001b[0m" : "") + "|");
 				for (int j = 0; j < flag.length; j++) {
 					// scale the rows according the the height-width ratio given
 					result.append(repeat(flag[i][j] ? whitePixel() : redPixel(), htwr));
 				}
-				result.append("\u001b[0m" + (drawBorder ? "|" : "") + "\n");
+				result.append((color ? "\u001b[0m" : "") + (drawBorder ? "|" : "") + "\n");
 			}
 			
 			if (drawBorder) result.append(horizontalBorder());
-			return result.toString();
+			return result.toString() + (color ? "\001b[0m" : "");
+		}
+		
+		@SuppressWarnings("serial")
+		class Cross extends JComponent {
+			private int scaling;
+			public Cross(int scaling) { this.scaling = scaling; }
+			
+			@Override
+			public void paint(Graphics g) {
+				g.setColor(Color.white);
+				g.fillRect(border * scaling, (border + arm) * scaling, middle * scaling, cross * scaling);
+				g.fillRect((border + arm) * scaling, border * scaling, cross * scaling, middle * scaling);
+			}
+			
+		}
+		
+		public void drawPicture(int scaling) {
+			JFrame frame = new JFrame();
+			frame.setSize(scaling * flag.length, scaling * flag.length);
+			frame.setVisible(true);
+			frame.getContentPane().setBackground(Color.red.darker());
+			frame.getContentPane().add(new Cross(scaling));
 		}
 	}
 	
@@ -212,7 +239,9 @@ public class SwissFlagProgram {
 		//System.out.println("\u2588 \u2588\u2588s     ");
 		//System.out.println(redPixel());
 		//System.out.println("\u2588");
-		System.out.println(new SwissFlag(60, true, true, true).drawFlag());
-		drawSwissFlag(40); // equiv to new SwissFlag(40, true, false, false).drawFlag();
+		SwissFlag s = new SwissFlag(40, true, true, false);
+		System.out.println(s.drawFlag());
+		s.drawPicture(23);
+		//drawSwissFlag(40); // equiv to new SwissFlag(40, true, false, false).drawFlag();
 	}
 }
