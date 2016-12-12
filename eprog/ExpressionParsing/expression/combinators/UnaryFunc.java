@@ -21,7 +21,7 @@ public abstract class UnaryFunc extends Expression {
     public double evaluateWith(Context context) throws EvaluationException {
         return this.f.apply(this.expr.evaluateWith(context));
     }
-    
+
     public <T> Set<T> getProperty(Function<Expression, T> selector) {
         Set<T> res = new HashSet<T>();
         T prop = selector.apply(this);
@@ -32,8 +32,8 @@ public abstract class UnaryFunc extends Expression {
         return res;
     }
 
-    public Expression replaceVariable(String varName, Expression newExpr) {
-        this.expr = this.expr.replaceVariable(varName, newExpr);
+    public Expression replaceVariable(Variable var, Expression newExpr) {
+        this.expr = this.expr.replaceVariable(var, newExpr);
         return this;
     }
 }

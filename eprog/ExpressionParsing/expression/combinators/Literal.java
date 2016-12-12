@@ -27,7 +27,7 @@ public class Literal extends Atom {
         return res;
     }
 
-    public Expression replaceVariable(String varName, Expression expression) {
+    public Expression replaceVariable(Variable var, Expression expression) {
         return this;
     }
 

@@ -37,9 +37,9 @@ public abstract class BinaryFunc extends Expression {
     /**
      * Recusively replace var in all subexpressions. Stateful.
      */
-    public Expression replaceVariable(String varName, Expression newExpr) {
-        this.left = this.left.replaceVariable(varName, newExpr);
-        this.right = this.right.replaceVariable(varName, newExpr);
+    public Expression replaceVariable(Variable var, Expression newExpr) {
+        this.left = this.left.replaceVariable(var, newExpr);
+        this.right = this.right.replaceVariable(var, newExpr);
         return this;
     }
 }

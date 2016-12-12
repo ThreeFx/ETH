@@ -39,7 +39,7 @@ public abstract class Expression {
      * Replaces all occurrences of Variable(varName) with a clone of the expression.
      * Returns the modified expression.
      */
-    public abstract Expression replaceVariable(String varName, Expression newExpr);
+    public abstract Expression replaceVariable(Variable var, Expression newExpr);
 
     /**
      * Returns a deep copy of the current expression.

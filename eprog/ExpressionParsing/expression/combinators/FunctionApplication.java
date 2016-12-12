@@ -28,17 +28,17 @@ public class FunctionApplication extends Expression {
             // We will use the function in the dictionary.
             // We do NOT update this.f because evaluation is dictionary-sensitive
             // and we do not want to be stuck with old definitions.
-            // we have to clone here to guarantee that context.getFunc is 
+            // we have to clone here to guarantee that context.getFunc is
             // not modified
 
             FunctionDefinition def = context.getFunc(this);
 //            System.out.println(def.applyTo(this.argument).toString());
             return def.applyTo(this.argument).evaluateWith(context);
         } else {
-            throw new NameResolutionException("Could not resolve function name '" + name + "'"); 
+            throw new NameResolutionException("Could not resolve function name '" + name + "'");
         }
     }
-    
+
     public <T> Set<T> getProperty(Function<Expression, T> selector) {
         Set<T> res = new HashSet<T>();
         T prop = selector.apply(this);
@@ -49,8 +49,8 @@ public class FunctionApplication extends Expression {
         return res;
     }
 
-    public Expression replaceVariable(String varName, Expression newExpr) {
-        this.argument = this.argument.replaceVariable(varName, newExpr);
+    public Expression replaceVariable(Variable var, Expression newExpr) {
+        this.argument = this.argument.replaceVariable(var, newExpr);
         return this;
     }
 

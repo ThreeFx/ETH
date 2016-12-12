@@ -4,6 +4,7 @@ import expression.combinators.*;
 import expression.exceptions.*;
 
 import java.util.*;
+import java.util.stream.*;
 
 public class Evaluator {
     private Context context;
@@ -19,10 +20,29 @@ public class Evaluator {
     }
 
     public Set<Variable> freeVars() {
-        return this.expression.getProperty(var -> (var instanceof Variable ? (Variable)var : null));
+        Set<Variable> res = freeVarsOf(this.expression);
+        res.addAll(context.getDefinitions().stream()
+                    .flatMap((FunctionDefinition func) -> freeVarsOf(func.body).stream()).collect(Collectors.toCollection(HashSet::new)));
+        res.removeAll(context.getVars());
+        res.removeAll(context.getDefinitions().stream().map(func -> func.parameter).collect(Collectors.toCollection(HashSet::new)));
+        return res;
     }
 
     public Set<FunctionApplication> unboundFunctions() {
-        return this.expression.getProperty(f -> (f instanceof FunctionApplication ? (FunctionApplication)f : null));
+        Set<FunctionApplication> res = unboundFunctionsOf(this.expression);
+        res.addAll(context.getDefinitions().stream()
+                    .flatMap((FunctionDefinition func) -> unboundFunctionsOf(func.body).stream()).collect(Collectors.toCollection(HashSet::new)));
+        res.removeAll(context.getFuncs());
+        return res;
+    }
+
+    private Set<Variable> freeVarsOf(Expression expression) {
+        return expression.getProperty(var ->
+                   (var instanceof Variable ? (Variable)var : null));
+    }
+
+    private Set<FunctionApplication> unboundFunctionsOf(Expression expression) {
+        return expression.getProperty(f ->
+                (f instanceof FunctionApplication ? (FunctionApplication)f : null));
     }
 }

@@ -8,8 +8,11 @@ import java.util.Scanner;
 public class EvaluatorApp {
     private static Scanner scanner;
     private static ExpressionParser parser;
+    private static boolean simpleParameters;
 
     public static void main(String[] args) {
+        simpleParameters = args.length == 0 || !(args[0].equals("-c"));
+
         scanner = new Scanner(System.in);
         parser = new ExpressionParser();
 
@@ -33,20 +36,24 @@ public class EvaluatorApp {
 
                     Context ctxt = new Context();
                     Evaluator eval = new Evaluator(expr, ctxt);
-                    
+
                     // We have free variables
                     // Prompt the user to enter their value
-                    for (Variable var : eval.freeVars()) {
-                        Expression ex = readExpr(var.name + " = ");
-                        ctxt.addVar(var, ex);
+                    while (!(eval.freeVars().isEmpty() && eval.unboundFunctions().isEmpty())) {
+                        //System.out.println(eval.freeVars());
+                        for (Variable var : eval.freeVars()) {
+                            Expression ex = readExpr(var.name + " = ");
+                            ctxt.addVar(var, ex);
+                        }
+
+                        //System.out.println(eval.unboundFunctions());
+                        // Get definitions for the functions:
+                        for (FunctionApplication fn : eval.unboundFunctions()) {
+                            FunctionDefinition def = readFunction(fn);
+                            ctxt.addFunc(fn, def);
+                        }
                     }
 
-                    // Get definitions for the functions:
-                    for (FunctionApplication fn : eval.unboundFunctions()) {
-                        FunctionDefinition def = readFunction(fn);
-                        ctxt.addFunc(fn, def);
-                    }
-                    
                     System.out.println(eval.evaluate());
                 } catch (EvaluationException e) {
                     System.out.println("Error while evaluating!\n" + e.getMessage());
@@ -59,9 +66,22 @@ public class EvaluatorApp {
         FunctionDefinition def = null;
         while (true) {
             try {
-                System.out.print(app.name + "(x) = ");
+                Variable var = null;
+
+                if (!simpleParameters) {
+                    System.out.print("parameter name for " + app.name + ": ");
+                    Expression expr = parser.parse(scanner.nextLine());
+                    if (!(expr instanceof Variable)) {
+                        throw new ParseException("Not a valid parameter name: " + expr);
+                    }
+                    var = (Variable)expr;
+                } else {
+                    var = new Variable("x");
+                }
+
+                System.out.print(app.name + "("+var.name+") = ");
                 Expression funcExpr = parser.parse(scanner.nextLine());
-                def = new FunctionDefinition(app.name, "x", funcExpr);
+                def = new FunctionDefinition(app.name, var, funcExpr);
             } catch (ParseException e) {
                 System.out.println("Error parsing definition\n" + e.getMessage() + "\n please try again");
                 continue;

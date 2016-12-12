@@ -7,8 +7,8 @@ import java.util.*;
 //import java.util.function.*;
 
 public class Context {
-    private Map<Variable, Expression> vars;
-    private Map<FunctionApplication, FunctionDefinition> funcs;
+    private final Map<Variable, Expression> vars;
+    private final Map<FunctionApplication, FunctionDefinition> funcs;
 
     public Context() {
         this(new HashMap<>(), new HashMap<>());
@@ -39,6 +39,10 @@ public class Context {
         return this.vars.get(var);
     }
 
+    public Set<Variable> getVars() {
+        return this.vars.keySet();
+    }
+
     public void addFunc(FunctionApplication app, FunctionDefinition def) {
         this.funcs.put(app, def);
     }
@@ -49,5 +53,13 @@ public class Context {
 
     public FunctionDefinition getFunc(FunctionApplication app) {
         return this.funcs.get(app);
+    }
+
+    public Set<FunctionApplication> getFuncs() {
+        return this.funcs.keySet();
+    }
+
+    public Collection<FunctionDefinition> getDefinitions() {
+        return this.funcs.values();
     }
 }

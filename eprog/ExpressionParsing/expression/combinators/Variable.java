@@ -14,7 +14,7 @@ public class Variable extends Atom {
     public Variable(String name) {
         this.name = name;
     }
-    
+
     /**
      * Evaluates the variable with the current value stores in the context.
      * Throws if variable is not defined.
@@ -30,14 +30,14 @@ public class Variable extends Atom {
     public <T> Set<T> getProperty(Function<Expression, T> selector) {
         Set<T> res = new HashSet<T>();
         T prop = selector.apply(this);
-        
+
         if (prop != null) res.add(prop);
 
         return res;
     }
 
-    public Expression replaceVariable(String varName, Expression newExpr) {
-        if (this.name.equals(varName)) {
+    public Expression replaceVariable(Variable var, Expression newExpr) {
+        if (this.equals(var)) {
             //System.out.println("replacing parameter '" + varName + "' by expression " + newExpr.toString());
             return newExpr.clone();
         } else {

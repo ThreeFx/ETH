@@ -14,10 +14,10 @@ import java.util.function.*;
  */
 public class FunctionDefinition {
     private final String name;
-    private final String parameter;
-    private final Expression body;
+    final Variable parameter;
+    final Expression body;
 
-    public FunctionDefinition(String name, String parameter, Expression body) {
+    public FunctionDefinition(String name, Variable parameter, Expression body) {
         this.name = name;
         this.parameter = parameter;
         this.body = body;
