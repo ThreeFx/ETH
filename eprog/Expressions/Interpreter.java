@@ -5,7 +5,7 @@ import expression.parser.ExpressionParser;
 
 import java.util.Scanner;
 
-public class EvaluatorApp {
+public class Interpreter {
     private static Scanner scanner;
     private static ExpressionParser parser;
     private static boolean simpleParameters;
@@ -38,20 +38,27 @@ public class EvaluatorApp {
                     Evaluator eval = new Evaluator(expr, ctxt);
 
                     // We have free variables
-                    // Prompt the user to enter their value
+                    // Prompt the user to enter their stuff
                     while (!(eval.freeVars().isEmpty() && eval.unboundFunctions().isEmpty())) {
-                        //System.out.println(eval.freeVars());
+                        boolean modified = false;
+
                         for (Variable var : eval.freeVars()) {
                             Expression ex = readExpr(var.name + " = ");
                             ctxt.addVar(var, ex);
+                            modified = true;
+                            break;
                         }
+                        if (modified) continue;
 
-                        //System.out.println(eval.unboundFunctions());
                         // Get definitions for the functions:
                         for (FunctionApplication fn : eval.unboundFunctions()) {
                             FunctionDefinition def = readFunction(fn);
+                            System.out.println(def == null ? "NULL": "not null");
                             ctxt.addFunc(fn, def);
+                            modified = true;
+                            break;
                         }
+                        if (modified) continue;
                     }
 
                     System.out.println(eval.evaluate());
@@ -80,8 +87,13 @@ public class EvaluatorApp {
                 }
 
                 System.out.print(app.name + "("+var.name+") = ");
-                Expression funcExpr = parser.parse(scanner.nextLine());
+                // DEBUG
+                String s = scanner.nextLine();
+                System.out.println(s);
+                Expression funcExpr = parser.parse(s);
                 def = new FunctionDefinition(app.name, var, funcExpr);
+                // DEBUG
+                System.out.println(def);
             } catch (ParseException e) {
                 System.out.println("Error parsing definition\n" + e.getMessage() + "\n please try again");
                 continue;

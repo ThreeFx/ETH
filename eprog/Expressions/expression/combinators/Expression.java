@@ -31,6 +31,11 @@ public abstract class Expression {
     public abstract double evaluateWith(Context context) throws EvaluationException;
 
     /**
+     * A standard post-order traversal of the expression tree.
+     */
+    public abstract ArrayList<T> postOrderTraversal(Function<Expression, T> map)
+
+    /**
      * Returns a set of non-null properties picked by the selector function.
      */
     public abstract <T> Set<T> getProperty(Function<Expression, T> selector);

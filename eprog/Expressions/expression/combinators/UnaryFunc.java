@@ -22,6 +22,13 @@ public abstract class UnaryFunc extends Expression {
         return this.f.apply(this.expr.evaluateWith(context));
     }
 
+    public ArrayList<T> postOrderTraversal(Function<Expression, T> map) {
+        ArrayList<T> res = new ArrayList<T>();
+        res.addAll(expr.postOrderTraversal(map));
+        res.add(map.apply(this));
+        return res;
+    }
+
     public <T> Set<T> getProperty(Function<Expression, T> selector) {
         Set<T> res = new HashSet<T>();
         T prop = selector.apply(this);

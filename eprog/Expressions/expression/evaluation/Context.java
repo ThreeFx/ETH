@@ -43,6 +43,10 @@ public class Context {
         return this.vars.keySet();
     }
 
+    public Collection<Expression> getVarDefs() {
+        return this.vars.values();
+    }
+
     public void addFunc(FunctionApplication app, FunctionDefinition def) {
         this.funcs.put(app, def);
     }

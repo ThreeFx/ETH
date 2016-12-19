@@ -35,6 +35,7 @@ public class FunctionApplication extends Expression {
 //            System.out.println(def.applyTo(this.argument).toString());
             return def.applyTo(this.argument).evaluateWith(context);
         } else {
+            System.out.println(context.getFunc(this));
             throw new NameResolutionException("Could not resolve function name '" + name + "'");
         }
     }
