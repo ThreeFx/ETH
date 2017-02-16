@@ -37,18 +37,18 @@ class Main {
     public static void main(String[] args) {
         //Test t = new Test();
         //System.out.println(t.foo(3.0f, 4.0f));
-        //System.out.println("j = " + (3 + 12 % 7 / 5 + 4 % 2));
-        //System.out.println("i = " + (3 / 4 * 7 % 4 + 1 * 2 / 5));
-        //try {
-        //    System.out.println("k = " + (48 + 12 / (8 % 4) * 2));
-        //} catch (ArithmeticException e) {
-        //    System.out.println("k: div by 0");
-        //}
-        //System.out.println("l = " + ((7 + 14 / 5) % 11));
-        //System.out.println("e = " + (5 / (30 / 15.0) * 6 / 10));
-        //System.out.println("f = " + (108 / 20 * 3 / 4 / 2.0 + 1.0 / 2));
-        //System.out.println("g = " + (3.0 / (2 / 3) + 14 % 10));
-        //System.out.println("last = " + (3 * 2 + 4 + "+" + 2 + 3 * 4));
+        System.out.println("j = " + (3 + 12 % 7 / 5 + 4 % 2));
+        System.out.println("i = " + (3 / 4 * 7 % 4 + 1 * 2 / 5));
+        try {
+            System.out.println("k = " + (48 + 12 / (8 % 4) * 2));
+        } catch (ArithmeticException e) {
+            System.out.println("k: div by 0");
+        }
+        System.out.println("l = " + ((7 + 14 / 5) % 11));
+        System.out.println("e = " + (5 / (30 / 15.0) * 6 / 10));
+        System.out.println("f = " + (108 / 20 * 3 / 4 / 2.0 + 1.0 / 2));
+        System.out.println("g = " + (3.0 / (2 / 3) + 14 % 10));
+        System.out.println("last = " + (3 * 2 + 4 + "+" + 2 + 3 * 4));
         //System.out.println(nuz(9593117));
         //System.out.println(nuz(39105389));
         //System.out.println(ez(9320));
