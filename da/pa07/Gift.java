@@ -38,6 +38,5 @@ class Main {
 		}
 
 		System.out.println(c);
-			
 	}
 }

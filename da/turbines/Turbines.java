@@ -25,7 +25,6 @@ class Main {
         int leftdindex = 0;
 
         for (int i = 0; i < n; i++) {
-            
             if (d[i] - tind > 0) {
                 maxs[i+1] = maxs[i] + d[i] - tind;
             }

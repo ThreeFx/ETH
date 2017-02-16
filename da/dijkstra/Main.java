@@ -2,7 +2,7 @@ import java.util.*;
 
 import java.io.*;
 
-public class Main {
+class Main {
     static BufferedReader r;
 
     public static void main(String[] args) throws IOException {
@@ -17,6 +17,7 @@ public class Main {
 //
 //        Scanner s = new Scanner(System.in);
 //        while (true) {
+//            System.out.print(">> ");
 //            String l = s.nextLine();
 //            if (l.equals("q")) {
 //                break;
@@ -40,33 +41,110 @@ public class Main {
 //
 //            heap.print();
 //        }
-//    }
+    }
 
     public static void solveCase() throws IOException {
         int n = Integer.parseInt(r.readLine());
         FibHeap<Data> heap = new FibHeap<Data>();
 
-        ArrayList<ArrayList<Node<Data>>> field = new ArrayList<ArrayList<Node<Data>>>(n);
+        ArrayList<ArrayList<Node<Data>>> dijkstra = new ArrayList<ArrayList<Node<Data>>>(n);
+        ArrayList<ArrayList<Integer>> field = new ArrayList<ArrayList<Integer>>(n);
+
+        int x0, y0;
 
         for (int i = 0; i < n; i++) {
             String[] nums = r.readLine().split(" ");
+            dijkstra.add(new ArrayList<Node<Data>>(n));
+            field.add(new ArrayList<Integer>(n));
             for (int j = 0; j < n; j++) {
-                Data d = new Data(Integer.parseInt(nums[j]), i, j);
-                Node<Data> n = heap.insert(d);
-                field.get(i).add(n);
+                int val = Integer.parseInt(nums[j]);
+                Data d = new Data(100000, i, j);
+                if (val == 0) {
+                    x0 = i;
+                    y0 = j;
+                    d = new Data(0, i, j);
+                }
+                Node<Data> no = heap.insert(d);
+                dijkstra.get(i).add(no);
+                field.get(i).add(val);
             }
             // For efficiency purposes.
-            Data d = heap.deleteMin();
+//            Data d = heap.deleteMin();
+//            heap.insert(d);
         }
 
+        //System.out.println(dijkstra.size());
+        //System.out.println(dijkstra.get(0).size());
+
+        //System.out.println("Heap TLT: " + heap.topLevelTrees);
+        //heap.print();
+
+        Data cur;
+        int min = 100000;
+        cur = heap.deleteMin();
+        for (int i = 0; i < n*n-n; i++) {
+            int distToCur = cur.value;
+            for (Integer[] neighbor : getNeighbors(cur, n)) {
+                int x = neighbor[0];
+                int y = neighbor[1];
+                int dijkDist = distToCur + field.get(x).get(y);
+                Node<Data> neighbNode = dijkstra.get(x).get(y);
+                if (dijkDist < neighbNode.value.value) {
+                    heap.decreaseKey(neighbNode, dijkDist);
+                }
+            }
+            cur = heap.deleteMin();
+
+            if (done(cur, n)) {
+                min = Math.min(cur.value, min);
+                continue;
+            }
+        }
+
+        System.out.println(min);
     }
 
-    public static int[] readMany() throws IOException {
-        String[] s = r.readLine().split(" ");
-        int[] a = new int[s.length];
-        for (int i = 0; i < s.length; i++)
-            a[i] = Integer.parseInt(s[i]);
-        return a;
+    private static ArrayList<Integer[]> getNeighbors(Data data, int n) {
+        ArrayList<Integer[]> res = new ArrayList<Integer[]>();
+        int x = data.x;
+        int y = data.y;
+        if (x > 0) {
+            res.add(new Integer[] { x - 1, y });
+        }
+        if (y > 0) {
+            res.add(new Integer[] { x, y - 1 });
+        }
+        if (x < n - 1) {
+            res.add(new Integer[] { x + 1, y });
+        }
+        if (y < n - 1) {
+            res.add(new Integer[] { x, y + 1 });
+        }
+        return res;
+    }
+
+    private static boolean done(Data data, int n) {
+        return data.x == 0 || data.x == n - 1
+            || data.y == 0 || data.y == n - 1;
+    }
+}
+
+class Data implements Gradeable {
+    int x, y;
+    int value;
+
+    public Data(int value, int x, int y) {
+        this.value = value;
+        this.x = x;
+        this.y = y;
+    }
+
+    public Integer getValue() {
+        return this.value;
+    }
+
+    public void decreaseKey(Integer value) {
+        this.value = value;
     }
 }
 
@@ -95,10 +173,11 @@ class FibHeap<T extends Gradeable> {
         this.topLevelTrees = 0;
     }
 
-    public void print() {
-        //System.out.println("FibHeap: TLT: " + topLevelTrees);
-        min.print();
-    }
+//    public void print() {
+//        System.out.println("FibHeap: TLT: " + topLevelTrees);
+//        if (topLevelTrees > 0)
+//            min.print();
+//    }
 
     public Node<T> insert(T value) {
         Node<T> newNode = new Node(value);
@@ -132,7 +211,7 @@ class FibHeap<T extends Gradeable> {
         this.topLevelTrees += this.min.degree - 1;
 
         if (this.min.degree > 0) {
-            this.min.child.setParent(this.min.parent);
+            this.min.child.setParent(null);
             this.min.concat(this.min.child);
         }
 
@@ -147,10 +226,10 @@ class FibHeap<T extends Gradeable> {
         }
         current = nextMin;
 
-        this.min.delete();
+        Node<T> oldmin = this.min.delete();
         this.min = current;
 
-        if (this.min.next == this.min && this.min.degree == 0) {
+        if (this.min == oldmin && this.min.degree == 0) {
             this.min = null;
             return result;
         }
@@ -162,14 +241,14 @@ class FibHeap<T extends Gradeable> {
 
         //System.out.println("  deleteMin: TLT: " + topLevelTrees);
         int tlt = topLevelTrees;
-        // TODO This has to be smaller than that.
-        for (int i = 0; i < tlt * tlt; i++) {
+        // //TODO This has to be smaller than that.
+        for (int i = 0; i < tlt * (tlt - 1) / 2; i++) {
             Node<T> candidate = numberChildren.get(current.degree);
             //System.out.println("\n\ncandidate:");
             //if (candidate != null) candidate.print();
             //System.out.println("\n");
             if (candidate != null && candidate != current) {
-                while (candidate != null) {
+                while (candidate != null && candidate != current) {
                     numberChildren.put(current.degree, null);
                     //System.out.println("Found 2 nodes with same degree (" + current.degree + "): " + current + " and " + candidate);
 
@@ -177,6 +256,7 @@ class FibHeap<T extends Gradeable> {
                     Node<T> larger = smaller == current ? candidate : current;
 
                     current = smaller.merge(larger);
+                    if (current.compareTo(this.min) <= 0) this.min = current;
                     topLevelTrees--;
 
                     candidate = numberChildren.put(current.degree, current);
@@ -186,6 +266,7 @@ class FibHeap<T extends Gradeable> {
             }
             current = current.next;
         }
+        //this.min = current;
 
         return result;
     }
@@ -226,7 +307,7 @@ class FibHeap<T extends Gradeable> {
             }
         }
 
-        if (toDecrease.compareTo(min) < 0) {
+        if (toDecrease.compareTo(this.min) < 0) {
             this.min = toDecrease;
         }
     }
@@ -308,58 +389,58 @@ class Node<T extends Gradeable> implements Comparable<Node<T>> {
         return this.value.getValue().compareTo(other.value.getValue());
     }
 
-    public void print() {
-        System.out.println("node:     " + this);
-        System.out.println("value:    " + this.value.getValue());
-        System.out.println("siblings: " + this.getSiblings());
-        System.out.println("parent:   " + this.parent);
-        System.out.println("degree:   " + this.degree);
-        System.out.println("children: " + this.getChildren());
-        System.out.println("marked:   " + this.marked);
-        System.out.println();
-
-        if (child != null) {
-            child.print();
-        }
-
-        Node<T> sibl = this.next;
-
-        while (sibl != this) {
-            sibl.printOne();
-            sibl = sibl.next;
-        }
-    }
-
-    public void printOne() {
-        System.out.println("node:     " + this);
-        System.out.println("value:    " + this.value.getValue());
-        System.out.println("siblings: " + this.getSiblings());
-        System.out.println("parent:   " + this.parent);
-        System.out.println("degree:   " + this.degree);
-        System.out.println("children: " + this.getChildren());
-        System.out.println("marked:   " + this.marked);
-        System.out.println();
-
-
-        if (child != null) {
-            child.print();
-        }
-    }
-
-    private String getSiblings() {
-        Node<T> cur = this.next;
-        String res = "";
-        while (this != cur) {
-            res += cur + " ";
-            cur = cur.next;
-        }
-        return res;
-    }
-
-    private String getChildren() {
-        if (this.child != null) {
-            return this.child + " " + this.child.getSiblings();
-        }
-        return "null";
-    }
+//    public void print() {
+//        System.out.println("node:     " + this);
+//        System.out.println("value:    " + this.value.getValue());
+//        System.out.println("siblings: " + this.getSiblings());
+//        System.out.println("parent:   " + this.parent);
+//        System.out.println("degree:   " + this.degree);
+//        System.out.println("children: " + this.getChildren());
+//        System.out.println("marked:   " + this.marked);
+//        System.out.println();
+//
+//        if (child != null) {
+//            child.print();
+//        }
+//
+//        Node<T> sibl = this.next;
+//
+//        while (sibl != this) {
+//            sibl.printOne();
+//            sibl = sibl.next;
+//        }
+//    }
+//
+//    public void printOne() {
+//        System.out.println("node:     " + this);
+//        System.out.println("value:    " + this.value.getValue());
+//        System.out.println("siblings: " + this.getSiblings());
+//        System.out.println("parent:   " + this.parent);
+//        System.out.println("degree:   " + this.degree);
+//        System.out.println("children: " + this.getChildren());
+//        System.out.println("marked:   " + this.marked);
+//        System.out.println();
+//
+//
+//        if (child != null) {
+//            child.print();
+//        }
+//    }
+//
+//    private String getSiblings() {
+//        Node<T> cur = this.next;
+//        String res = "";
+//        while (this != cur) {
+//            res += cur + " ";
+//            cur = cur.next;
+//        }
+//        return res;
+//    }
+//
+//    private String getChildren() {
+//        if (this.child != null) {
+//            return this.child + " " + this.child.getSiblings();
+//        }
+//        return "null";
+//    }
 }
