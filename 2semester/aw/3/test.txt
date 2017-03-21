@@ -1,0 +1,13 @@
+abc
+cde
+bcd
+no
+abc
+bca
+bcd
+no
+aaa
+bbb
+no
+aaa
+no
