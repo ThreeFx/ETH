@@ -4,6 +4,15 @@ My personal work on my lectures at ETH Zurich.
 
 ## Notable projects
 
+### Out of order execution
+
+Compile `00_pprog.c` with `gcc -pthread` and run the result. In some cases
+(~1/3000) on my machine, the result will be 00, which is not possible due to
+thread interleaving but only because of out of order store/load instructions.
+
+Optionally, run ./test.sh on linux to run until such a case is found (takes
+a lot of cpu).
+
 ### Expression parser
 
 Located in `eprog/ExpressionParser`
