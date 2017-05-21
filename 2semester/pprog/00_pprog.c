@@ -1,12 +1,12 @@
 #include "stdio.h"
 #include "pthread.h"
 
-int x, y;
+volatile int x, y;
 
 void* t1(void* param) {
     int r1;
     y = 1;
-    //asm ("mfence");
+    asm ("mfence");
     r1 = x;
     printf("%d", r1);
     fflush(stdout);
@@ -15,7 +15,7 @@ void* t1(void* param) {
 void* t2(void* param) {
     int r2;
     x = 1;
-    //asm ("mfence");
+    asm ("mfence");
     r2 = y;
     printf("%d", r2);
     fflush(stdout);

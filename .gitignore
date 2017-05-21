@@ -6,3 +6,11 @@
 Judge*
 
 *.exe
+
+*.jar
+
+*.s
+*.ll
+
+*.zip
+*.out

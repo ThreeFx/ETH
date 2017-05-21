@@ -9,7 +9,7 @@ while [[ $COUNTER != $GOAL ]]; do
     TRIES=0;
     while [[ $RES != "00" ]]; do
         RES=`./a.out`
-        echo $RES
+        #echo $RES
         TRIES=$(($TRIES + 1))
         if [[ $TRIES -ge 100000 ]]; then
             echo "after $TRIES tries no degenerate case"
