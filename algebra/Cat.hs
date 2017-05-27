@@ -75,14 +75,14 @@ instance Monad Hask [] where
 bind :: Monad c m => (a ~> m b) c -> (m a ~> m b) c
 bind f = mu . fmap f
 
-newtype Kleisli c m a b = Kleisli c (a) (m b)
+newtype Kleisli c m a b = Kleisli (c a (m b))
 
 instance (Monad c m) => Category (Kleisli c m) where
   id  = Kleisli eta
--- (.) :: Monad m c => (y ~> m z) c -> (x ~> m y) c -> (x ~> m z) c
+-- (.) :: Monad c m => (y ~> m z) c -> (x ~> m y) c -> (x ~> m z) c
   (Kleisli yz) . (Kleisli xy) = Kleisli $ mu . fmap yz . xy
 
-(<=<) = (.)
-(>=>) = flip (.)
-
-
+--(<=<) :: (Kleisli c m x y, Kleisli c m y z) => (y ~> z) c -> (x ~> y) c -> (x ~> z) c
+--(<=<) = (.)
+--(>=>) :: Kleisli c m => (x ~> y) c -> (y ~> z) c -> (x ~> z) c
+--(>=>) = flip (.)
