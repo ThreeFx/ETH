@@ -82,7 +82,7 @@ instance (Monad c m) => Category (Kleisli c m) where
 -- (.) :: Monad c m => (y ~> m z) c -> (x ~> m y) c -> (x ~> m z) c
   (Kleisli yz) . (Kleisli xy) = Kleisli $ mu . fmap yz . xy
 
---(<=<) :: (Kleisli c m x y, Kleisli c m y z) => (y ~> z) c -> (x ~> y) c -> (x ~> z) c
---(<=<) = (.)
---(>=>) :: Kleisli c m => (x ~> y) c -> (y ~> z) c -> (x ~> z) c
---(>=>) = flip (.)
+(<=<) :: Monad c m => Kleisli c m y z -> Kleisli c m x y -> Kleisli c m x z
+(<=<) = (.)
+(>=>) :: Monad c m => Kleisli c m x y -> Kleisli c m y z -> Kleisli c m x z
+(>=>) = flip (.)
